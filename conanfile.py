@@ -38,6 +38,7 @@ class LibffiConan(ConanFile):
     def package(self):
         self.copy('*.h', src='%s/include' % self.build_dir, dst='include')
         self.copy('libffi.dylib', src='%s/lib' % self.build_dir, dst='lib')
+        self.copy(pattern='*.pc', dst='', keep_path=False)
 
     def package_info(self):
         self.cpp_info.libs = ['ffi']
