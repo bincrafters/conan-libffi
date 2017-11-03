@@ -13,8 +13,7 @@ class LibffiConan(ConanFile):
 
     def source(self):
         tools.get('https://sourceware.org/pub/libffi/libffi-%s.tar.gz' % self.version,
-                  # sha256='70bfb01356360089aa97d3e71e3edf05d195599fd822e922e50d46a0055a6283'
-                  )
+                  sha256='70bfb01356360089aa97d3e71e3edf05d195599fd822e922e50d46a0055a6283')
         tools.replace_in_file('%s/configure' % self.source_dir,
                               'multi_os_directory=`$CC -print-multi-os-directory`',
                               'multi_os_directory=')
