@@ -16,9 +16,9 @@ Project {
 		cpp.cxxStandardLibrary: 'libstdc++'
 		cpp.linkerPath: '/usr/local/bin/clang++'
 		cpp.linkerWrapper: undefined
-		cpp.minimumMacosVersion: '10.8'
+		cpp.minimumMacosVersion: '10.10'
 		cpp.rpaths: [ buildDirectory + '/../../bin' ]
-		cpp.target: 'x86_64-apple-macosx10.8'
+		cpp.target: 'x86_64-apple-macosx10.10'
 
 		Depends { name: 'xcode' }
 		xcode.sdk: 'macosx10.10'
