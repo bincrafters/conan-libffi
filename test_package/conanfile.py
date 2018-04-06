@@ -14,3 +14,4 @@ class LibffiTestConan(ConanFile):
 
         # Ensure we only link to system libraries.
         self.run('! (otool -L bin/libffi.dylib | tail +3 | egrep -v "^\s*(/usr/lib/|/System/)")')
+        self.run('! (otool -l lib/libffi.dylib | grep -A2 LC_RPATH | cut -d"(" -f1 | grep "\s*path" | egrep -v "^\s*path @(executable|loader)_path")')
