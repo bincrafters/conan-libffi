@@ -1,6 +1,7 @@
 import qbs 1.0
 
 Project {
+	minimumQbsVersion: '1.6'
 	references: [ buildDirectory + '/../conanbuildinfo.qbs' ]
 	Product {
 		type: 'application'
@@ -9,19 +10,36 @@ Project {
 		Depends { name: 'ConanBasicSetup' }
 
 		Depends { name: 'cpp' }
-		cpp.compilerPathByLanguage: ({
-			c: '/usr/local/bin/clang',
-			cpp: '/usr/local/bin/clang++',
-		})
-		cpp.cxxStandardLibrary: 'libstdc++'
-		cpp.linkerPath: '/usr/local/bin/clang++'
-		cpp.linkerWrapper: undefined
-		cpp.minimumMacosVersion: '10.10'
-		cpp.rpaths: [ buildDirectory + '/../../bin' ]
-		cpp.target: 'x86_64-apple-macosx10.10'
+		property string binDirectory: {
+			return buildDirectory.substr(0, buildDirectory.lastIndexOf('/', buildDirectory.lastIndexOf('/') - 1)) + "/bin";
+		}
+		cpp.compilerPathByLanguage: {
+			return {
+				"c": binDirectory + '/clang',
+				"cpp": binDirectory + '/clang++',
+			};
+		}
+		cpp.cxxStandardLibrary: 'libc++'
+		cpp.linkerPath: binDirectory + '/clang++'
+		cpp.rpaths: [ buildDirectory + '/../../lib' ]
 
-		Depends { name: 'xcode' }
-		xcode.sdk: 'macosx10.10'
+		Depends {
+			condition: qbs.targetOS.contains('macos')
+			name: 'xcode'
+		}
+		Properties {
+			condition: qbs.targetOS.contains('macos')
+			cpp.linkerWrapper: undefined
+			cpp.minimumMacosVersion: '10.10'
+			cpp.target: 'x86_64-apple-macosx10.10'
+			cpp.stripPath: '/usr/bin/true'
+			xcode.sdk: 'macosx10.13'
+		}
+		Properties {
+			condition: qbs.targetOS.contains('linux')
+			cpp.cxxFlags: [ '-fblocks' ]
+			cpp.target: 'x86_64-unknown-linux-gnu'
+		}
 
 		files: [ 'test_package.cc' ]
 	}

@@ -1,5 +1,6 @@
 from conans import ConanFile, tools, AutoToolsBuildEnvironment
 import os
+import platform
 
 class LibffiConan(ConanFile):
     name = 'libffi'
@@ -8,6 +9,7 @@ class LibffiConan(ConanFile):
     package_version = '3'
     version = '%s-%s' % (source_version, package_version)
 
+    build_requires = 'llvm/3.3-5@vuo/stable'
     settings = 'os', 'compiler', 'build_type', 'arch'
     url = 'https://github.com/vuo/conan-libffi'
     license = 'https://github.com/libffi/libffi/blob/master/LICENSE'
@@ -28,6 +30,10 @@ class LibffiConan(ConanFile):
         tools.mkdir(self.build_dir)
         with tools.chdir(self.build_dir):
             autotools = AutoToolsBuildEnvironment(self)
+
+            # The LLVM/Clang libs get automatically added by the `requires` line,
+            # but this package doesn't need to link with them.
+            autotools.libs = ['c++abi']
 
             autotools.flags.append('-Oz')
 
@@ -50,8 +56,15 @@ class LibffiConan(ConanFile):
                 autotools.make(args=['install'])
  
     def package(self):
+        if platform.system() == 'Darwin':
+            libext = 'dylib'
+        elif platform.system() == 'Linux':
+            libext = 'so'
+        else:
+            raise Exception('Unknown platform "%s"' % platform.system())
+
         self.copy('*.h', src='%s/include' % self.build_dir, dst='include')
-        self.copy('libffi.dylib', src='%s/lib' % self.build_dir, dst='lib')
+        self.copy('libffi.%s' % libext, src='%s/lib' % self.build_dir, dst='lib')
         self.copy(pattern='*.pc', dst='', keep_path=False)
 
         self.copy('%s.txt' % self.name, src=self.source_dir, dst='license')
