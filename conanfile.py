@@ -5,7 +5,7 @@ import platform
 class LibffiConan(ConanFile):
     name = 'libffi'
 
-    source_version = '3.0.11'
+    source_version = '3.0.12'
     package_version = '3'
     version = '%s-%s' % (source_version, package_version)
 
@@ -19,7 +19,7 @@ class LibffiConan(ConanFile):
 
     def source(self):
         tools.get('https://sourceware.org/pub/libffi/libffi-%s.tar.gz' % self.source_version,
-                  sha256='70bfb01356360089aa97d3e71e3edf05d195599fd822e922e50d46a0055a6283')
+                  sha256='2ea0db90c2bbcc907c3aefc3f76e9dfc3b35c7a0fb75a4319f5248e0172c1e9e')
         tools.replace_in_file('%s/configure' % self.source_dir,
                               'multi_os_directory=`$CC -print-multi-os-directory`',
                               'multi_os_directory=')
