@@ -22,6 +22,8 @@ class LibffiConan(ConanFile):
                               'multi_os_directory=`$CC -print-multi-os-directory`',
                               'multi_os_directory=')
 
+        self.run('mv %s/LICENSE %s/%s.txt' % (self.source_dir, self.source_dir, self.name))
+
     def build(self):
         tools.mkdir(self.build_dir)
         with tools.chdir(self.build_dir):
@@ -42,6 +44,8 @@ class LibffiConan(ConanFile):
         self.copy('*.h', src='%s/include' % self.build_dir, dst='include')
         self.copy('libffi.dylib', src='%s/lib' % self.build_dir, dst='lib')
         self.copy(pattern='*.pc', dst='', keep_path=False)
+
+        self.copy('%s.txt' % self.name, src=self.source_dir, dst='license')
 
     def package_info(self):
         self.cpp_info.libs = ['ffi']
