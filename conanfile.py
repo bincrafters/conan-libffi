@@ -28,17 +28,26 @@ class LibffiConan(ConanFile):
         tools.mkdir(self.build_dir)
         with tools.chdir(self.build_dir):
             autotools = AutoToolsBuildEnvironment(self)
+
             autotools.flags.append('-Oz')
-            autotools.flags.append('-mmacosx-version-min=10.10')
-            autotools.link_flags.append('-Wl,-install_name,@rpath/libffi.dylib')
-            autotools.configure(configure_dir='../%s' % self.source_dir,
-                                args=['--quiet',
-                                      '--disable-debug',
-                                      '--disable-dependency-tracking',
-                                      '--disable-static',
-                                      '--enable-shared',
-                                      '--prefix=%s' % os.getcwd()])
-            autotools.make(args=['install'])
+
+            if platform.system() == 'Darwin':
+                autotools.flags.append('-mmacosx-version-min=10.10')
+                autotools.link_flags.append('-Wl,-install_name,@rpath/libffi.dylib')
+
+            env_vars = {
+                'CC' : self.deps_cpp_info['llvm'].rootpath + '/bin/clang',
+                'CXX': self.deps_cpp_info['llvm'].rootpath + '/bin/clang++',
+            }
+            with tools.environment_append(env_vars):
+                autotools.configure(configure_dir='../%s' % self.source_dir,
+                                    args=['--quiet',
+                                          '--disable-debug',
+                                          '--disable-dependency-tracking',
+                                          '--disable-static',
+                                          '--enable-shared',
+                                          '--prefix=%s' % os.getcwd()])
+                autotools.make(args=['install'])
  
     def package(self):
         self.copy('*.h', src='%s/include' % self.build_dir, dst='include')
