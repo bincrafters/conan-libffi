@@ -1,27 +1,24 @@
-from conans import ConanFile
-import platform
+# -*- coding: utf-8 -*-
 
-class LibffiTestConan(ConanFile):
-    requires = 'llvm/3.3-5@vuo/stable'
-    generators = 'qbs'
+import os
+
+from conans import ConanFile, CMake
+
+
+class TclTestConan(ConanFile):
+    settings = "os", "compiler", "build_type", "arch"
+    generators = "cmake"
 
     def build(self):
-        self.run('qbs -f "%s"' % self.source_folder)
+        cmake = CMake(self)
+        cmake.configure()
+        cmake.build()
 
     def imports(self):
-        self.copy('*', src='bin', dst='bin')
-        self.copy('*', src='lib', dst='lib')
+        self.copy("*.dll", dst="bin", src="bin")
+        self.copy("*.dylib*", dst="bin", src="lib")
+        self.copy("*.so*", dst="bin", src="lib")
 
     def test(self):
-        self.run('qbs run -f "%s"' % self.source_folder)
-
-        # Ensure we only link to system libraries.
-        if platform.system() == 'Darwin':
-            self.run('! (otool -L lib/libffi.dylib | tail +3 | egrep -v "^\s*(/usr/lib/|/System/)")')
-            self.run('! (otool -L lib/libffi.dylib | fgrep "libstdc++")')
-            self.run('! (otool -l lib/libffi.dylib | grep -A2 LC_RPATH | cut -d"(" -f1 | grep "\s*path" | egrep -v "^\s*path @(executable|loader)_path")')
-        elif platform.system() == 'Linux':
-            self.run('! (ldd lib/libffi.so | grep -v "^lib/" | grep "/" | egrep -v "(\s(/lib64/|(/usr)?/lib/x86_64-linux-gnu/)|test_package/build)")')
-            self.run('! (ldd lib/libffi.so | fgrep "libstdc++")')
-        else:
-            raise Exception('Unknown platform "%s"' % platform.system())
+        bin_path = os.path.join("bin", "test_package")
+        self.run(bin_path, run_environment=True)
