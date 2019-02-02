@@ -1,5 +1,9 @@
 extern "C" {
 
+#if defined(_MSC_VER)
+#pragma runtime_checks("s", off)
+#endif
+
 #include <ffi.h>
 
 #include <stddef.h>
@@ -43,6 +47,7 @@ int main()
             puts("ffi_call FAILED\n");
             return EXIT_FAILURE;
         }
+        return EXIT_SUCCESS;
     }
     {
         #ifdef FFI_CLOSURES
@@ -89,3 +94,7 @@ int main()
 }
 
 }
+
+#if defined(_MSC_VER)
+#pragma runtime_checks("s", restore)
+#endif
