@@ -177,6 +177,8 @@ class LibffiConan(ConanFile):
                 autotools.defines.append("USE_DEBUG_RTL")
             if self.settings.arch == "x86_64":
                 msvcc_args.append("-m64")
+            elif self.settings.arch == "x86":
+                msvcc_args.append("-m32")
             if msvcc_args:
                 msvcc = "{} {}".format(msvcc, " ".join(msvcc_args))
             extra_env_vars.update(tools.vcvars_dict(self.settings))
@@ -209,7 +211,7 @@ class LibffiConan(ConanFile):
             host = "{}-{}-{}".format(
                 "x86_64" if self.settings.arch == "x86_64" else "i686",
                 "pc" if self.settings.arch == "x86" else "w64",
-                "windows" if self.settings.arch == "x86" else "cygwin")
+                "cygwin")
         else:
             if autotools.host and "x86-" in autotools.host:
                 autotools.host = autotools.host.replace("x86", "i686")
