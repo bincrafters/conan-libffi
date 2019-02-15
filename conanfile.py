@@ -216,6 +216,8 @@ class LibffiConan(ConanFile):
             if autotools.host and "x86-" in autotools.host:
                 autotools.host = autotools.host.replace("x86", "i686")
         with self._create_auto_tools_environment(autotools):
+            if self.settings.os == "Macos":
+                tools.replace_in_file(os.path.join(self.source_folder, self._source_subfolder, "configure"), r"-install_name \$rpath/", "-install_name ")
             autotools.configure(configure_dir=os.path.join(self.source_folder, self._source_subfolder),
                                 build=build,
                                 host=host,
