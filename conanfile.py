@@ -31,7 +31,8 @@ class LibffiConan(ConanFile):
         extracted_dir = "{}-{}".format(self.name, self.version)
         os.rename(extracted_dir, self._source_subfolder)
 
-        configure_path = os.path.join(self.source_folder, self._source_subfolder, "configure")
+    def _patch_files(self):
+        configure_path = os.path.join(self._source_subfolder, "configure")
         tools.replace_in_file(configure_path,
                               "LIBTOOL='$(SHELL) $(top_builddir)/libtool'\n",
                               "LIBTOOL='$(SHELL) $(top_builddir)/libtool.sh'\n")
@@ -39,7 +40,7 @@ class LibffiConan(ConanFile):
                               "ofile=libtool\n",
                               "ofile=libtool.sh\n")
 
-        tools.replace_in_file(os.path.join(self.source_folder, self._source_subfolder, "src", "x86", "win64.S"),
+        tools.replace_in_file(os.path.join(self._source_subfolder, "src", "x86", "win64.S"),
                               "jmp\tSHORT",
                               "jmp")
 
@@ -71,7 +72,7 @@ class LibffiConan(ConanFile):
                          "#  define FFI_EXTERN extern\n" \
                          "#endif\n"
 
-        ffi_h_in = os.path.join(self.source_folder, self._source_subfolder, "include", "ffi.h.in")
+        ffi_h_in = os.path.join(self._source_subfolder, "include", "ffi.h.in")
         tools.replace_in_file(ffi_h_in, ffi_extern_src, "")
         tools.replace_in_file(ffi_h_in,
                               "#include <ffitarget.h>\n",
@@ -107,7 +108,7 @@ class LibffiConan(ConanFile):
                                   function,
                                   "FFI_EXTERN {}".format(function))
 
-        types_c_src = os.path.join(self.source_folder, self._source_subfolder, "src", "types.c")
+        types_c_src = os.path.join(self._source_subfolder, "src", "types.c")
         tools.replace_in_file(types_c_src,
                               "#include <ffi_common.h>",
                               "#include <ffi_common.h>\n"
@@ -141,6 +142,8 @@ class LibffiConan(ConanFile):
         tools.replace_in_file(types_c_src,
                               "FFI_COMPLEX_TYPEDEF(longdouble, long double, FFI_LDBL_CONST)",
                               "FFI_COMPLEX_TYPEDEF(longdouble, LDOUBLE_COMPLEX, FFI_LDBL_CONST)")
+        if self.settings.os == "Macos":
+            tools.replace_in_file(configure_path, r"-install_name \$rpath/", "-install_name ")
 
     def config_options(self):
         if self.settings.os == "Windows":
@@ -195,6 +198,7 @@ class LibffiConan(ConanFile):
             yield
 
     def build(self):
+        self._patch_files()
         config_args = [
             "--enable-debug" if self.settings.build_type == "Debug" else "--disable-debug",
             "--enable-shared" if self.options.shared else "--disable-shared",
@@ -216,8 +220,6 @@ class LibffiConan(ConanFile):
             if autotools.host and "x86-" in autotools.host:
                 autotools.host = autotools.host.replace("x86", "i686")
         with self._create_auto_tools_environment(autotools):
-            if self.settings.os == "Macos":
-                tools.replace_in_file(os.path.join(self.source_folder, self._source_subfolder, "configure"), r"-install_name \$rpath/", "-install_name ")
             autotools.configure(configure_dir=os.path.join(self.source_folder, self._source_subfolder),
                                 build=build,
                                 host=host,
@@ -225,7 +227,7 @@ class LibffiConan(ConanFile):
             autotools.make()
             if tools.get_env("CONAN_RUN_TESTS", False):
                 autotools.make(target="check")
- 
+
     def package(self):
         if self.settings.os == "Windows":
             self.copy("*.h", src="{}/include".format(self.build_folder), dst="include")
