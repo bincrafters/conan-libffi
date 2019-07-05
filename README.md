@@ -1,5 +1,5 @@
 [![Download](https://api.bintray.com/packages/bincrafters/public-conan/libffi%3Abincrafters/images/download.svg) ](https://bintray.com/bincrafters/public-conan/libffi%3Abincrafters/_latestVersion)
-[![Build Status](https://travis-ci.org/bincrafters/conan-libffi.svg?branch=stable%2F3.2.1)](https://travis-ci.org/bincrafters/conan-libffi)
+[![Build Status](https://travis-ci.com/bincrafters/conan-libffi.svg?branch=stable%2F3.2.1)](https://travis-ci.com/bincrafters/conan-libffi)
 [![Build status](https://ci.appveyor.com/api/projects/status/github/bincrafters/conan-libffi?branch=stable%2F3.2.1&svg=true)](https://ci.appveyor.com/project/bincrafters/conan-libffi)
 
 [Conan.io](https://conan.io) package recipe for [*libffi*](https://sourceware.org/libffi/).
