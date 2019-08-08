@@ -8,7 +8,7 @@ class LibffiConan(ConanFile):
     name = "libffi"
     version = "3.3-rc0"
     description = "A portable, high level programming interface to various calling conventions"
-    topics = ["conan", "libffi"]
+    topics = ("conan", "libffi")
     url = "https://github.com/bincrafters/conan-libffi"
     homepage = "https://sourceware.org/libffi/"
     author = "Bincrafters <bincrafters@gmail.com>"
